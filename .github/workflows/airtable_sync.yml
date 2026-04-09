@@ -6,8 +6,12 @@ on:
   workflow_dispatch:         # GitHub에서 수동 실행 버튼
 
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
+    
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # ← 이 줄 추가
+    
     steps:
       - name: 저장소 체크아웃
         uses: actions/checkout@v4
@@ -15,7 +19,7 @@ jobs:
       - name: Python 설치
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: 패키지 설치
         run: pip install requests
@@ -33,3 +37,9 @@ jobs:
           git add kugak.json
           git diff --cached --quiet || git commit -m "kugak.json 자동 업데이트 ($(date '+%Y-%m-%d %H:%M KST'))"
           git push
+
+    - name: 저장소 체크아웃
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # 전체 히스토리 가져오기 (선택)
